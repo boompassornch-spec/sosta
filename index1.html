@@ -3,77 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <title>ระบบแจ้งเหตุสาธารณภัย อบต.ต้า</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>ระบบแจ้งเหตุสาธารณภัย<br>องค์การบริหารส่วนตำบลต้า อ.ขุนตาล จ.เชียงราย</h1>
-  </header>
+<header>
+  <img src="logo.png" alt="โลโก้" class="logo">
+  <h1>ระบบแจ้งเหตุสาธารณภัย อบต.ต้า อ.ขุนตาล จ.เชียงราย</h1>
+</header>
 
-  <!-- เมนู Tab -->
-  <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="report">แจ้งเหตุ</button>
-    <button class="tab-btn" data-tab="view">ข้อมูลร้องเรียน</button>
-    <button class="tab-btn" data-tab="stats">สถิติ</button>
-    <button class="tab-btn" data-tab="admin">เจ้าหน้าที่</button>
-  </nav>
+<nav>
+  <button onclick="openTab('report')">แจ้งเหตุ</button>
+  <button onclick="openTab('view')">ข้อมูลร้องเรียน</button>
+  <button onclick="openTab('stats')">สถิติ</button>
+  <button onclick="openTab('admin')">สำหรับเจ้าหน้าที่</button>
+</nav>
 
+<main>
   <!-- Tab แจ้งเหตุ -->
-  <section id="report" class="tab-content active">
-    <h2>แจ้งเหตุ</h2>
+  <section id="report" class="tab">
+    <h2>แจ้งเหตุสาธารณภัย</h2>
     <form id="reportForm">
-      <label>ชื่อ-นามสกุล</label>
-      <input type="text" name="fullName" required>
-
-      <label>ที่อยู่</label>
-      <textarea name="address" required></textarea>
-
-      <label>เบอร์โทรศัพท์</label>
-      <input type="tel" name="phone" required>
-
-      <label>รายละเอียด</label>
-      <textarea name="details" required></textarea>
-
+      <input type="hidden" id="reportNumber">
+      <label>ชื่อ-นามสกุล</label><input type="text" id="fullName" required>
+      <label>ที่อยู่</label><textarea id="address" required></textarea>
+      <label>เบอร์โทร</label><input type="tel" id="phone" required>
+      <label>รายละเอียด</label><textarea id="details"></textarea>
       <label>ประเภทปัญหา</label>
-      <select name="problemType" required>
-        <option value="อุทกภัย">อุทกภัย</option>
-        <option value="วาตภัย">วาตภัย</option>
-        <option value="อัคคีภัย">อัคคีภัย</option>
-        <option value="ภัยหนาว">ภัยหนาว</option>
-        <option value="ภัยแล้ง">ภัยแล้ง</option>
-        <option value="แผ่นดินถล่ม">แผ่นดินถล่ม</option>
-        <option value="การระบาดของโรค">การระบาดของโรค</option>
-        <option value="ภัยจากฝูงสัตว์และแมลง">ภัยจากฝูงสัตว์และแมลง</option>
-        <option value="อื่นๆ">อื่นๆ</option>
+      <select id="problemType" required>
+        <option value="">--เลือก--</option>
+        <option>อุทกภัย</option><option>วาตภัย</option><option>อัคคีภัย</option>
+        <option>ภัยหนาว</option><option>ภัยแล้ง</option><option>แผ่นดินถล่ม</option>
+        <option>การระบาดของโรค</option><option>ภัยจากสัตว์และแมลง</option><option>อื่นๆ</option>
       </select>
-
-      <label>พิกัด (Latitude, Longitude)</label>
-      <input type="text" name="latitude" placeholder="ละติจูด">
-      <input type="text" name="longitude" placeholder="ลองจิจูด">
-      <button type="button" id="pickLocation">ค้นหาพิกัด</button>
-
-      <label>อัพโหลดรูป (สูงสุด 3 รูป)</label>
-      <input type="file" id="images" name="images" accept="image/*" multiple>
-
+      <label>พิกัด</label>
+      <input type="text" id="latitude" placeholder="ละติจูด">
+      <input type="text" id="longitude" placeholder="ลองจิจูด">
+      <label>อัปโหลดรูป (ไม่เกิน 3)</label>
+      <input type="file" id="images" multiple accept="image/*">
       <button type="submit">บันทึกข้อมูล</button>
     </form>
   </section>
 
-  <!-- Tab ดูข้อมูล -->
-  <section id="view" class="tab-content">
+  <!-- Tab ข้อมูลร้องเรียน -->
+  <section id="view" class="tab">
     <h2>ข้อมูลร้องเรียน</h2>
-    <input type="text" id="searchReport" placeholder="ค้นหาด้วยเลขที่รับแจ้ง">
+    <input type="text" id="searchReportNumber" placeholder="ค้นหาด้วยเลขที่รับแจ้ง">
+    <button onclick="fetchReports()">ค้นหา</button>
     <table id="reportTable">
       <thead>
         <tr>
-          <th>เลขที่</th>
-          <th>ชื่อผู้แจ้ง</th>
-          <th>รายละเอียด</th>
-          <th>ประเภท</th>
-          <th>สถานะ</th>
-          <th>ดูรูป</th>
+          <th>เลขที่รับแจ้ง</th><th>ชื่อผู้แจ้ง</th><th>รายละเอียด</th><th>ประเภท</th><th>สถานะ</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -81,41 +63,36 @@
   </section>
 
   <!-- Tab สถิติ -->
-  <section id="stats" class="tab-content">
-    <h2>สถิติ</h2>
-    <label>เลือกเดือน</label>
-    <input type="month" id="statMonth">
-    <button id="loadStats">โหลดข้อมูล</button>
-    <canvas id="chartType" width="400" height="200"></canvas>
-    <div id="statusCounts"></div>
+  <section id="stats" class="tab">
+    <h2>สถิติการดำเนินงาน</h2>
+    <label>เลือกเดือน</label><input type="month" id="statMonth">
+    <button onclick="fetchStats()">ข้อมูลล่าสุด</button>
+    <canvas id="problemChart" width="400" height="200"></canvas>
   </section>
 
   <!-- Tab Admin -->
-  <section id="admin" class="tab-content">
+  <section id="admin" class="tab">
     <h2>สำหรับเจ้าหน้าที่</h2>
-    <div id="loginBox">
+    <div id="adminLogin">
       <input type="text" id="adminUser" placeholder="Username">
       <input type="password" id="adminPass" placeholder="Password">
-      <button id="adminLogin">เข้าสู่ระบบ</button>
+      <button onclick="adminLogin()">เข้าสู่ระบบ</button>
     </div>
     <div id="adminPanel" style="display:none;">
+      <h3>จัดการข้อมูลร้องเรียน</h3>
       <table id="adminTable">
         <thead>
           <tr>
-            <th>เลขที่</th>
-            <th>ชื่อผู้แจ้ง</th>
-            <th>รายละเอียด</th>
-            <th>สถานะ</th>
-            <th>บันทึก</th>
+            <th>เลขที่</th><th>ชื่อ</th><th>รายละเอียด</th><th>ประเภท</th><th>สถานะ</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-      <button id="downloadPDF">สรุปรายงาน PDF</button>
+      <button onclick="exportPDF()">ส่งออก PDF</button>
     </div>
   </section>
+</main>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
