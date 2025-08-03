@@ -1,0 +1,16 @@
+body { font-family: 'Tahoma', sans-serif; margin:0; background:#f9f9f9; }
+header { background:#004aad; color:white; padding:20px; text-align:center; }
+h1 { margin:0; font-size:22px; }
+h2 { color:#333; }
+.tab-nav { display:flex; background:#eee; }
+.tab-btn { flex:1; padding:10px; cursor:pointer; border:none; background:#ddd; }
+.tab-btn.active { background:#004aad; color:white; }
+.tab-content { display:none; padding:20px; }
+.tab-content.active { display:block; }
+form label { display:block; margin-top:10px; }
+form input, form textarea, form select { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
+button { margin-top:10px; padding:10px 15px; background:#004aad; color:white; border:none; border-radius:5px; cursor:pointer; }
+button:hover { background:#003080; }
+table { width:100%; border-collapse:collapse; margin-top:15px; }
+table th, table td { border:1px solid #ccc; padding:8px; text-align:left; }
+#statusCounts { margin-top:15px; }
